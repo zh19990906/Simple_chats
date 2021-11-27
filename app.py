@@ -326,6 +326,7 @@ def Logon():
         username = request.json.get('username', None)
         email = request.json.get('email', None)
         if username and email:
+            # 过滤一下空格
             if ' ' in username or ' ' in email:
                 return 'Hello World!', 500
             if mysql_select(user_email=email, user_name=username):
