@@ -20,4 +20,7 @@ WORKDIR /usr/src/app
 
 RUN pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
 
+# 修改时区
+RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
 CMD ["python3", "app.py"]
