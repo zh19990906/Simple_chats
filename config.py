@@ -21,7 +21,7 @@ REDIS_DB='0'
 REDIS_DB_TOKEN='11' # 这个库最好是空的
 REDIS_DB_USER_TOKEN='10' # 这个库最好是空的
 REDIS_DB_SIMPLE='12' # 这个库最好是空的
-REDIS_DECODE_RESPONSES=True # 会报错 所以不设置了
+REDIS_DECODE_RESPONSES=True # 读取中文的时候需要用到
 REDIS_PASSWORD='你的redis密码'
 
 
