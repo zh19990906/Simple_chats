@@ -39,5 +39,27 @@ function logon() {
     })
 }
 
+
+function refresh() {
+    $.ajax({
+        url: '/api/login/token',
+        data: JSON.stringify({
+            'token': window.decodeURI(Cookies('token')),
+        }),
+        type: 'POST',
+        contentType: 'application/json',
+        dataType: 'json',
+        statusCode: {
+            200: function () {
+                alert('欢迎回到我们的扯犊子公会');
+                window.location.replace('/chatroom');
+            },
+
+        }
+
+    })
+}
+
+refresh();
 $('#logon').click(logon);
 
