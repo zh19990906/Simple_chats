@@ -296,24 +296,28 @@ def make_redis_token(username):
     return str(token)
 
 
+# 跳转到登录页
 @app.route('/')
 def hello_world():
     # db.create_all()
     return render_template('login.html')
 
 
+# 跳转到注册页
 @app.route('/logon')
 def logons():
     # db.create_all()
     return render_template('logon.html')
 
 
+# 转发登录
 @app.route('/login')
 def logins():
     # db.create_all()
     return render_template('login.html')
 
 
+# 进入聊天主页
 @app.route('/chatroom')
 def chartroom():
     return render_template('chatroom.html')
@@ -361,7 +365,8 @@ def login():
             return resp, 200
         else:
             return 'Hello World!', 500
-    except:
+    except Exception as e:
+        print(e)
         return 'Hello World!', 590
 
 
@@ -447,7 +452,8 @@ def speak_log():
             # print(data)
             data = sorted(data, key=lambda list1: list1["spoke_time"], reverse=True)
             data = time_make(data)
-            return {"data": data}, 200
+            username=get_redis_token(token=token)
+            return {"data": data,"username":username}, 200
 
         else:
             return 'Hello World!', 400

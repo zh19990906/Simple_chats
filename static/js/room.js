@@ -1,4 +1,4 @@
-function generate_chat_list_html(chat_list) {
+function generate_chat_list_html(chat_list,username) {
     var msg_list = '';
     // alert(chat_list['spoken_text'])
     for (i = 0; i < chat_list.length; i++) {
@@ -7,7 +7,7 @@ function generate_chat_list_html(chat_list) {
         post_time = chat_list[i]['spoke_time'];
         var line = '<div class="columns" style="margin-top: 5px">';
         line += '<div class="user_name">';
-        if (nick === window.decodeURI(Cookies('name'))) {
+        if (nick === username) {
             line += '<span class="label label-success centered">' + '我' + '</span>';
         } else {
             line += '<span class="label label-secondary">' + nick + '</span>';
@@ -29,14 +29,14 @@ function refresh() {
         url: '/api/speak/log',
         data: JSON.stringify({
             'token': window.decodeURI(Cookies('token')),
-            'chat_name':'测试',
+            'chat_name':'text',
         }),
         type: 'POST',
         contentType: 'application/json',
         dataType: 'json',
         success: function (data) {
             // console.log(data.data);
-            var chat_list_html = generate_chat_list_html((data.data));
+            var chat_list_html = generate_chat_list_html(data.data,data.username);
 
             $(".panel-body").html(chat_list_html)
         },
@@ -66,7 +66,7 @@ function post_data() {
         url: '/api/speak',
         data: JSON.stringify({
             'token': window.decodeURI(Cookies('token')),
-            'chat_name':'测试',
+            'chat_name':'text',
             'spoken_text': msg
         }),
         type: 'POST',
