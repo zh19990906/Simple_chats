@@ -20,3 +20,16 @@ dockerfile已将写好，修改完config.py中的配置后可以直接使用。
 # 鸣谢
 
 此处鸣谢git上多个项目的前段借鉴，以及ajax的处理逻辑，十分感谢。
+# docker命令
+
+## 打包命令
+在项目目录下：docker build -t simole:v2 .
+
+simole：名字
+v2：版本
+## 查看
+docker images
+## 启动命令
+docker run -itd --name 新名字 -p 宿主机端口:docker环境内的端口 -d 打包好的id
+
+例： docker run -itd --name simolev2 -p 7799:7788 -d 4e41911249c6
