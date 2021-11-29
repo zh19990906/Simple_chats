@@ -3,7 +3,7 @@ import schedule
 import time
 
 def func():
-    r = redis.Redis(host='localhost', port='6379', db='12', decode_responses=True, password='zhangheng0906')
+    r = redis.Redis(host='localhost', port='redis端口', db='12', decode_responses=True, password='redis密码')
     key_list = r.keys()
     # print(key_list)
     for key in key_list:
