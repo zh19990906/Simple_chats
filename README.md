@@ -2,6 +2,8 @@
 
 #### 介绍
 Redis+ Python3 + flask实现简易聊天室
+#### 源码
+https://github.com/zh19990906/Simple_chats
 
 # Redis
 
