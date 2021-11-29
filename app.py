@@ -8,9 +8,10 @@ import time
 import random
 import string
 import json
+import os
 
 from datetime import datetime
-from flask import Flask, request, make_response, render_template
+from flask import Flask, request, make_response, render_template, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 
@@ -460,6 +461,13 @@ def speak_log():
         pass
     else:
         return 'Hello World!', 300
+
+
+
+@app.route('/favicon.ico')#设置icon
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static/ico'),#对于当前文件所在路径,比如这里是static下的favicon.ico
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 if __name__ == '__main__':
