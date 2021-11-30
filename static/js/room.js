@@ -25,17 +25,19 @@ function generate_chat_list_html(chat_list,username) {
 }
 
 function refresh() {
+    var chat_only_name = $('#post').val();
     $.ajax({
         url: '/api/speak/log',
         data: JSON.stringify({
             'token': window.decodeURI(Cookies('token')),
-            'chat_name':'text',
+            'chat_only_name':chat_only_name,
+            'texts':chat_only_name
         }),
         type: 'POST',
         contentType: 'application/json',
         dataType: 'json',
         success: function (data) {
-            // console.log(data.data);
+
             var chat_list_html = generate_chat_list_html(data.data,data.username);
 
             $(".panel-body").html(chat_list_html)
@@ -57,6 +59,7 @@ function refresh() {
 
 function post_data() {
     var msg = $('.form-input').val();
+    // console.log($('#post').val());
     if (msg === '') {
         alert('内容不能为空！');
         return
@@ -66,7 +69,7 @@ function post_data() {
         url: '/api/speak',
         data: JSON.stringify({
             'token': window.decodeURI(Cookies('token')),
-            'chat_name':'text',
+            'chat_only_name':'text',
             'spoken_text': msg
         }),
         type: 'POST',

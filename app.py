@@ -11,7 +11,7 @@ import json
 import os
 
 from datetime import datetime
-from flask import Flask, request, make_response, render_template, send_from_directory
+from flask import Flask, request, make_response, render_template, send_from_directory, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 
@@ -67,7 +67,7 @@ class Chat_content(db.Model):
     __tablename__ = 'chat_content'
     # 定义列对象
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    chat_name = db.Column(db.VARCHAR(255), unique=False)  # 聊天室名字
+    chat_only_name = db.Column(db.VARCHAR(255), unique=False)  # 聊天室名字
     spoke_man = db.Column(db.VARCHAR(255), unique=False)  # 发言人
     spoke_time = db.Column(db.VARCHAR(255), unique=False)  # 发言时间戳
     spoken_text = db.Column(db.TEXT, unique=False)  # 发言内容
@@ -93,20 +93,20 @@ def get_all_content():
             data.append(content_data)
         return data
     else:
-        return None
+        return []
     pass
 
 
 # mysql数据存储
-def mysql_content_in(chat_name, spoke_man, spoke_time, spoken_text):
-    user = Chat_content(chat_name=chat_name, spoke_man=spoke_man, spoke_time=spoke_time, spoken_text=spoken_text)
+def mysql_content_in(chat_only_name, spoke_man, spoke_time, spoken_text):
+    user = Chat_content(chat_only_name=chat_only_name, spoke_man=spoke_man, spoke_time=spoke_time, spoken_text=spoken_text)
     db.session.add(user)
     db.session.commit()
     pass
 
 
-# redis存储当天的数据内容
-def set_redis_content(chat_room, text):
+# redis存储聊天内容
+def set_redis_content(chat_only_name, text):
     pool = redis.ConnectionPool(
         host=app.config.get('REDIS_HOST'),
         port=app.config.get('REDIS_PORT'),
@@ -114,12 +114,12 @@ def set_redis_content(chat_room, text):
         password=app.config.get('REDIS_PASSWORD', None)
     )
     r = redis.Redis(connection_pool=pool)
-    r.sadd(chat_room, text)
+    r.sadd(chat_only_name, text)
     pass
 
 
 # redis 获取当前的聊天
-def get_redis_content(chat_room):
+def get_redis_content(chat_only_name):
     pool = redis.ConnectionPool(
         host=app.config.get('REDIS_HOST'),
         port=app.config.get('REDIS_PORT'),
@@ -128,7 +128,7 @@ def get_redis_content(chat_room):
         decode_responses=True
     )
     r = redis.Redis(connection_pool=pool)
-    data_set = r.smembers(chat_room)
+    data_set = r.smembers(chat_only_name)
     return data_set
 
 
@@ -183,6 +183,15 @@ def mysql_select(user_name, user_email):
         else:
             return False
 
+# 聊天室名字校验
+def chat_name_check(chat_only_name):
+    count = db.session.query(func.count(Chat_Room.chat_only_name)).filter(Chat_Room.chat_only_name == chat_only_name)\
+        .filter(Chat_Room.char_run=='t').scalar()
+    if count:
+        return True
+    else:
+        return False
+
 
 # 获取注册名
 def mysql_select_username(user_email):
@@ -196,7 +205,7 @@ def mysql_select_username(user_email):
 # redis存储token
 def set_redis_token(token, username):
     token_like = backups_redis_token(username=username)
-    # print(token_like)
+
     if token_like:
         del_redis_token(token=token_like)
         pool = redis.ConnectionPool(
@@ -317,14 +326,57 @@ def logons():
 # 转发登录
 @app.route('/login')
 def logins():
-    # db.create_all()
+
     return render_template('login.html')
 
 
-# 进入聊天主页
-@app.route('/chatroom')
+# 聊天详情页
+@app.route('/chatroom/<chat_only_name>')
+def chatroom_only(chat_only_name):
+    # db.create_all()
+    token = request.cookies.get("token")
+    if token:
+        data = {'chat_only_name': chat_only_name}
+        return render_template('chatroom.html',data=data)
+    else:
+        return render_template('login.html')
+
+# 转发
+@app.route('/chatroom/')
+def forward():
+    # db.create_all()
+    token = request.cookies.get("token")
+    if token:
+        return redirect(url_for('choice'))
+    else:
+        return render_template('login.html')
+
+# 登录后进行跳转
+@app.route('/choice')
+def choice():
+    token = request.cookies.get("token")
+    if token:
+        content_data = get_all_content()
+        return render_template('choice_room.html',content_data=content_data)
+    else:
+        return render_template('login.html')
+
+
+# 进入房间主页
+@app.route('/api/chatroom/check',methods=['POST'])
 def chartroom():
-    return render_template('chatroom.html')
+    token = request.cookies.get("token")
+    if token:
+        # 获取到聊天室的唯一名称
+        chat_only_name = request.json.get("chat_only_name")
+        if chat_name_check(chat_only_name=chat_only_name):
+            data = {'chat_only_name': chat_only_name}
+            return {"chat_only_data": data}, 200
+        else:
+            return 'Hello World!',333
+    else:
+        return 'Hello World!',300
+
 
 
 # 注册
@@ -401,6 +453,7 @@ def logout():
     pass
 
 
+
 # 聊天室获取
 @app.route('/api/content/all', methods=['POST'])
 def content_all():
@@ -421,20 +474,20 @@ def content_all():
 def speak():
     token = request.cookies.get("token")
     if token:
-        chat_name = request.json.get("chat_name")
+        chat_only_name = request.json.get("chat_only_name")
         spoke_man = get_redis_token(token)
         spoke_time = str(int(time.time()))
         spoken_text = request.json.get("spoken_text")
-        if chat_name and spoke_man and spoke_time and spoken_text:
+        if chat_only_name and spoke_man and spoke_time and spoken_text:
             if 'rm' in spoken_text:
                 resp = make_response("del success")
                 resp.delete_cookie('token')
                 resp.delete_cookie('name')
                 return resp, 500
-            text = json_str({"chat_name": chat_name, "spoke_man": spoke_man, "spoke_time": spoke_time,
+            text = json_str({"chat_only_name": chat_only_name, "spoke_man": spoke_man, "spoke_time": spoke_time,
                              "spoken_text": spoken_text})
-            mysql_content_in(chat_name=chat_name, spoke_man=spoke_man, spoke_time=spoke_time, spoken_text=spoken_text)
-            set_redis_content(chat_room=chat_name, text=text)
+            mysql_content_in(chat_only_name=chat_only_name, spoke_man=spoke_man, spoke_time=spoke_time, spoken_text=spoken_text)
+            set_redis_content(chat_only_name=chat_only_name, text=text)
             return 'Hello World!', 200
             pass
         else:
@@ -448,10 +501,11 @@ def speak():
 @app.route('/api/speak/log', methods=["POST"])
 def speak_log():
     token = request.cookies.get("token")
+    # print(request.json.get("texts"))
     if token:
-        chat_name = request.json.get("chat_name")
-        if chat_name:
-            data = get_redis_content(chat_name)
+        chat_only_name = request.json.get("chat_only_name")
+        if chat_only_name:
+            data = get_redis_content(chat_only_name=chat_only_name)
             data = content_set_list(data)
             # data数据进行处理 然后排序
             data = time_set(data=data)

@@ -25,7 +25,7 @@ function logon() {
         statusCode: {
             200: function () {
                 alert('欢迎回到我们的扯犊子公会');
-                window.location.replace('/chatroom');
+                window.location.replace('/choice');
                 // window.location.href = "index.html";
             },
             500: function (){
@@ -52,7 +52,7 @@ function refresh() {
         statusCode: {
             200: function () {
                 alert('欢迎回到我们的扯犊子公会');
-                window.location.replace('/chatroom');
+                window.location.replace('/choice');
             },
 
         }

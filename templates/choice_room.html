@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <div class="panel-body">
+        {% for i in content_data%}
+            <div class="columns" style="margin-top: 10px">
+                <div class="rooms" width="30%" hight="100%" float="left">
+                    <p><img src="/static/images/room.png" width="70" height="70" style="float:left;" /></p>
+                </div>
+                <div class="rooms" width="30%" float="right" >
+                    <ul text-align="center" hight="100%">
+                        <li value="'+chat_only_name+'" text-align="center">名称：{{ i['chat_name'] }}</li>
+                        <li value="'+chat_only_name+'" text-align="center">创建日期：{{ i['char_make_time'] }}</li>
+                    </ul>
+                </div>
+                <div class="empty-action input-group input-inline" float="right"width="30%">
+                    <button class="btn btn-primary input-group-btn" onclick="go_chat(this)" value="{{ i['chat_only_name'] }}">进入</button>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <script src="{{url_for('static', filename='js/choice_room.js')}}"></script>
+{% endblock %}
