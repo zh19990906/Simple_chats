@@ -331,7 +331,7 @@ def Logon():
         username = request.json.get('username', None)
         email = request.json.get('email', None)
         if username and email:
-            # 过滤一下空格
+            # 过滤一下空格以及一些词语
             if ' ' in username or ' ' in email or 'root' in username or 'root' in email or 'admin' in username or \
                     'admin' in email:
                 return 'Hello World!', 500
