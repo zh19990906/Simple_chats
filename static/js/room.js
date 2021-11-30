@@ -30,8 +30,7 @@ function refresh() {
         url: '/api/speak/log',
         data: JSON.stringify({
             'token': window.decodeURI(Cookies('token')),
-            'chat_only_name':chat_only_name,
-            'texts':chat_only_name
+            'chat_only_name':chat_only_name
         }),
         type: 'POST',
         contentType: 'application/json',
@@ -58,6 +57,7 @@ function refresh() {
 }
 
 function post_data() {
+    var chat_only_name = $('#post').val();
     var msg = $('.form-input').val();
     // console.log($('#post').val());
     if (msg === '') {
@@ -67,9 +67,10 @@ function post_data() {
 
     $.ajax({
         url: '/api/speak',
+
         data: JSON.stringify({
             'token': window.decodeURI(Cookies('token')),
-            'chat_only_name':'text',
+            'chat_only_name':chat_only_name,
             'spoken_text': msg
         }),
         type: 'POST',
