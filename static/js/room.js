@@ -78,8 +78,6 @@ function post_data() {
         dataType: 'json',
         statusCode: {
             200: function () {
-                // alert('欢迎加入我们的扯犊子公会');
-                // window.location.replace('/');
                 refresh();
                 $("#divId").val("");
                 time();
