@@ -49,6 +49,7 @@ class Chat_Room(db.Model):
     # 定义列对象
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     chat_name = db.Column(db.VARCHAR(255), unique=True)  # 聊天室名字
+    chat_only_name = db.Column(db.VARCHAR(255), unique=True) # 聊天室唯一名称标识
     char_run = db.Column(db.VARCHAR(255), unique=False, default='t')  # 是否可用
     char_make_time = db.Column(db.DateTime, unique=False, default=datetime.now)  # 创建时间
     char_last_time = db.Column(db.DateTime, unique=False, default=datetime.now, onupdate=datetime.now)  # 上次运行时间
@@ -87,6 +88,7 @@ def get_all_content():
         for i in di:
             content_data = {}
             content_data['chat_name'] = i.chat_name
+            content_data['chat_only_name'] = i.chat_only_name
             content_data['char_make_time'] = i.char_make_time
             data.append(content_data)
         return data
@@ -300,6 +302,7 @@ def make_redis_token(username):
 # 跳转到登录页
 @app.route('/')
 def hello_world():
+    # 首次运行需要讲下面这行解开注释，这样运行访问主页时会自动创建表格
     # db.create_all()
     return render_template('login.html')
 
