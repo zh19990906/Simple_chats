@@ -332,8 +332,10 @@ def Logon():
         email = request.json.get('email', None)
         if username and email:
             # 过滤一下空格
-            if ' ' in username or ' ' in email:
+            if ' ' in username or ' ' in email or 'root' in username or 'root' in email or 'admin' in username or \
+                    'admin' in email:
                 return 'Hello World!', 500
+            # 这里的重复检测其实可以使用redis进行检测增加系统检测速度
             if mysql_select(user_email=email, user_name=username):
                 return 'Hello World!', 530
             else:
