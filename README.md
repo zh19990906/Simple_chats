@@ -40,6 +40,11 @@ docker run -itd --name 新名字 -p 宿主机端口:docker环境内的端口 -d 
 增加了聊天室选择
 修改了部分bug
 
+
+# 联系我
+Q：1093869292
+
+email：zhang19990906@gmail.com
 # 鸣谢
 
 此处鸣谢git上多个项目的前段借鉴，以及ajax的处理逻辑，十分感谢。
