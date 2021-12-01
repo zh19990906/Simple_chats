@@ -437,9 +437,11 @@ def login_token():
         if username:
             return {'result': 1, 'username': username}, 200
         else:
-            return 'Hello World!', 500
+            # token 过期
+            return 'Hello World!', 430
         pass
     else:
+        # 无token
         return 'Hello World!', 500
 
 
