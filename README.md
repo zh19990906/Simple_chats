@@ -34,7 +34,7 @@ docker run -itd --name 新名字 -p 宿主机端口:docker环境内的端口 -d 
 
 例： docker run -itd --name simolev2 -p 7799:7788 -d 4e41911249c6
 
-#v2.0测试版
+# v2.0测试版说明
 修改了部分表结构
 增加了聊天室的验证
 增加了聊天室选择
