@@ -11,7 +11,7 @@
             </div>
             <div class="panel-footer">
                 <div class="input-group">
-                    <input class="form-input" type="text" placeholder="Hello" id="divId">
+                    <input class="form-input" type="text" placeholder="Hello" id="divId"  onkeydown='if(event.keyCode==13){post.click()}'>
                     <button class="btn btn-primary input-group-btn" id="post" value="{{ data['chat_only_name'] }}">发送</button>
                 </div>
             </div>
