@@ -58,5 +58,5 @@ function logon() {
     })
 }
 
-$('#logon').click(logon);
+$('#reg').click(logon);
 

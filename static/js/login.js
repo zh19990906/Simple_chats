@@ -61,5 +61,5 @@ function refresh() {
 }
 
 refresh();
-$('#logon').click(logon);
+$('#upload').click(logon);
 
