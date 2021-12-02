@@ -3,7 +3,11 @@
 #### 介绍
 Redis+Python3+flask实现简易聊天室
 #### 源码
-https://github.com/zh19990906/Simple_chats
+[GitHub](https://github.com/zh19990906/Simple_chats)
+
+#### 演示网址
+
+[这里](http://49.232.30.93:7799/)
 
 # Redis
 
@@ -15,9 +19,6 @@ https://github.com/zh19990906/Simple_chats
 
 dockerfile已将写好，修改完config.py中的配置后可以直接使用。
 
-# 演示网址
-
-[这里](http://49.232.30.93:7799/)
 
 
 # docker命令
