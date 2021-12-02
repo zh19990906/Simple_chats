@@ -7,7 +7,7 @@
                 <p class="empty-title h5">欢迎回来</p>
                 <p class="empty-subtitle">在下面输入任何你的邮箱，<a href="/logon">点我注册。</a> </p>
                 <div class="empty-action input-group input-inline">
-                    <input class="form-input" type="email" id="email" placeholder="邮箱" if(event.keyCode==13){logon.click()}'>
+                    <input class="form-input" type="email" id="email" placeholder="邮箱" onkeydown='if(event.keyCode==13){post.click()}'>
                 </div>
                 <div class="empty-action input-group input-inline">
                     <button class="btn btn-primary input-group-btn" id="logon">登录</button>
