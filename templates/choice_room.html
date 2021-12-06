@@ -1,9 +1,35 @@
 {% extends 'base.html' %}
 {% block content %}
+    <style>
+        .information{
+            float:right;
 
-    <div class="panel-body">
-        {% for i in content_data%}
-            <div class="columns" style="margin-top: 10px">
+
+        }
+        #usernames{
+            font-size: 40px;
+            border:0px solid #ccc;
+
+        }
+        #logout,#Sign_in{
+            background-color:#ffffff;
+            border:0px solid #ccc;
+            font-size: 30px;
+        }
+
+    </style>
+    <div class="information" hight="100%">
+        {% if data["integral_state"] == 1 %}
+            <button id="Sign_in" >签到</button>
+        {% elif data["integral_state"] == 0 %}
+            <button id="Sign_in" disabled="disabled">今日已签到</button>
+        {% endif %}
+        <button id="logout" >注销</button>
+        <i id="usernames">{{ data["username"] }}</i>
+    </div>
+    <div class="panel-body" style="margin-top: 80px">
+        {% for i in data["content_data"]%}
+            <div class="columns" style="margin-top: 50px">
                 <div class="rooms" width="30%" hight="100%" float="left">
                     <p><img src="/static/images/room.png" width="70" height="70" style="float:left;" /></p>
                 </div>

@@ -1,6 +1,6 @@
 import pymysql
 
-pymysql.install_as_MySQLdb() # 解决py3版本报错没有mysqldb
+pymysql.install_as_MySQLdb()  # 解决py3版本报错没有mysqldb
 
 import uuid
 import redis
@@ -49,7 +49,7 @@ class Chat_Room(db.Model):
     # 定义列对象
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     chat_name = db.Column(db.VARCHAR(255), unique=True)  # 聊天室名字
-    chat_only_name = db.Column(db.VARCHAR(255), unique=True) # 聊天室唯一名称标识
+    chat_only_name = db.Column(db.VARCHAR(255), unique=True)  # 聊天室唯一名称标识
     char_run = db.Column(db.VARCHAR(255), unique=False, default='t')  # 是否可用
     char_make_time = db.Column(db.DateTime, unique=False, default=datetime.now)  # 创建时间
     char_last_time = db.Column(db.DateTime, unique=False, default=datetime.now, onupdate=datetime.now)  # 上次运行时间
@@ -75,9 +75,39 @@ class Chat_content(db.Model):
 
     # repr()方法显示一个可读字符串
     def __repr__(self):
-        return 'chat_name:%s' % self.chat_name
+        return 'chat_only_name:%s' % self.chat_only_name
 
     pass
+
+
+# 签到信息表
+class Sign_in(db.Model):
+    # 定义表名
+    __tablename__ = 'sign_in'
+    # 定义列对象
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_email = db.Column(db.VARCHAR(255), unique=False)  # 邮箱
+    integral = db.Column(db.Integer, unique=False)  # 积分
+    content_time = db.Column(db.DateTime, unique=False, default=datetime.now, onupdate=datetime.now)  # 时间
+
+    # repr()方法显示一个可读字符串
+    def __repr__(self):
+        return 'user_email:%s' % self.user_email
+
+
+# 积分统计表
+class Integrals(db.Model):
+    # 定义表名
+    __tablename__ = 'integrals'
+    # 定义列对象
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_email = db.Column(db.VARCHAR(255), unique=False)  # 邮箱
+    integral_all = db.Column(db.Integer, unique=False, default=0)  # 累积积分
+    content_time = db.Column(db.DateTime, unique=False, default=datetime.now, onupdate=datetime.now)  # 时间
+
+    # repr()方法显示一个可读字符串
+    def __repr__(self):
+        return 'user_email:%s' % self.user_email
 
 
 # 获取所有聊天室
@@ -97,9 +127,56 @@ def get_all_content():
     pass
 
 
+# 根据名字获取邮箱
+def get_username_email(username):
+    di = db.session.query(Users).filter(Users.user_name == username).first()
+    return di.user_email
+
+
+# 签到
+def get_sign(user_email, integral):
+    Sign = Sign_in(user_email=user_email, integral=integral)
+    db.session.add(Sign)
+    db.session.commit()
+
+
+# 查询积分表是否有该用户
+def get_integrals_user(user_email):
+    count = db.session.query(func.count(Integrals.user_email)).filter(Integrals.user_email == user_email).scalar()
+    if count:
+        # 存在
+        return True
+    else:
+        # 不存在
+        return False
+
+
+# 添加用户
+def set_integrals_user(user_email):
+    Integral = Integrals(user_email=user_email)
+    db.session.add(Integral)
+    db.session.commit()
+
+
+# 积分更新
+def set_integrals(user_email, integral):
+    data = db.session.query(Integrals).filter(Integrals.user_email == user_email).first()
+    data.integral_all += integral
+    db.session.add(data)
+    db.session.commit()
+    pass
+
+
+# 积分查询
+def get_integrals(user_email):
+    di = db.session.query(Integrals).filter(Integrals.user_email == user_email).first()
+    return {"user_email": di.user_email, "integral_all": di.integral_all, "content_time": di.content_time}
+
+
 # mysql数据存储
 def mysql_content_in(chat_only_name, spoke_man, spoke_time, spoken_text):
-    user = Chat_content(chat_only_name=chat_only_name, spoke_man=spoke_man, spoke_time=spoke_time, spoken_text=spoken_text)
+    user = Chat_content(chat_only_name=chat_only_name, spoke_man=spoke_man, spoke_time=spoke_time,
+                        spoken_text=spoken_text)
     db.session.add(user)
     db.session.commit()
     pass
@@ -132,11 +209,40 @@ def get_redis_content(chat_only_name):
     return data_set
 
 
+# redis 签到人员存储
+def set_redis_sign(email):
+    pool = redis.ConnectionPool(
+        host=app.config.get('REDIS_HOST'),
+        port=app.config.get('REDIS_PORT'),
+        db=app.config.get('REDIS_SIGN_IN_DB'),
+        password=app.config.get('REDIS_PASSWORD', None)
+    )
+    r = redis.Redis(connection_pool=pool)
+    return r.sadd(app.config.get('REDIS_SIGN_IN_NAME'), email)
+    pass
+
+
+# redis 签到人员获取
+def get_redis_sign():
+    pool = redis.ConnectionPool(
+        host=app.config.get('REDIS_HOST'),
+        port=app.config.get('REDIS_PORT'),
+        db=app.config.get('REDIS_SIGN_IN_DB'),
+        password=app.config.get('REDIS_PASSWORD', None),
+        decode_responses=True
+    )
+    r = redis.Redis(connection_pool=pool)
+    return r.smembers(app.config.get('REDIS_SIGN_IN_NAME'))
+    pass
+
+
 # set 转成list  list中存储dict
 def content_set_list(data):
     set_list = set(data)
+    # print("103869292@qq.com" in set_list)
     data_list = []
     for i in set_list:
+        print(i)
         try:
             data_list.append(json.loads(i))
         except Exception as e:
@@ -163,6 +269,7 @@ def time_set(data):
         data[i]['spoke_time'] = int(data[i]['spoke_time'])
     return data
 
+
 # 注册名存储
 def mysql_username(user_name, user_email):
     user = Users(user_name=user_name, user_email=user_email)
@@ -183,10 +290,11 @@ def mysql_select(user_name, user_email):
         else:
             return False
 
+
 # 聊天室名字校验
 def chat_name_check(chat_only_name):
-    count = db.session.query(func.count(Chat_Room.chat_only_name)).filter(Chat_Room.chat_only_name == chat_only_name)\
-        .filter(Chat_Room.char_run=='t').scalar()
+    count = db.session.query(func.count(Chat_Room.chat_only_name)).filter(Chat_Room.chat_only_name == chat_only_name) \
+        .filter(Chat_Room.char_run == 't').scalar()
     if count:
         return True
     else:
@@ -312,7 +420,7 @@ def make_redis_token(username):
 @app.route('/')
 def hello_world():
     # 首次运行需要讲下面这行解开注释，这样运行访问主页时会自动创建表格
-    # db.create_all()
+    db.create_all()
     return render_template('login.html')
 
 
@@ -326,7 +434,6 @@ def logons():
 # 转发登录
 @app.route('/login')
 def logins():
-
     return render_template('login.html')
 
 
@@ -337,9 +444,10 @@ def chatroom_only(chat_only_name):
     token = request.cookies.get("token")
     if token:
         data = {'chat_only_name': chat_only_name}
-        return render_template('chatroom.html',data=data)
+        return render_template('chatroom.html', data=data)
     else:
         return render_template('login.html')
+
 
 # 转发
 @app.route('/chatroom/')
@@ -351,19 +459,32 @@ def forward():
     else:
         return render_template('login.html')
 
+
 # 登录后进行跳转
 @app.route('/choice')
 def choice():
     token = request.cookies.get("token")
     if token:
+        username = get_redis_token(token=token)
         content_data = get_all_content()
-        return render_template('choice_room.html',content_data=content_data)
+        user_email = get_username_email(username=username)
+        # print(get_redis_sign())
+        # user_signs = content_set_list(get_redis_sign())
+        if user_email in set(get_redis_sign()):
+            integral_state = 0
+        else:
+            integral_state = 1
+        data = {}
+        data['content_data'] = content_data
+        data['username'] = username
+        data['integral_state'] = integral_state
+        return render_template('choice_room.html', data=data)
     else:
         return render_template('login.html')
 
 
 # 进入房间主页
-@app.route('/api/chatroom/check',methods=['POST'])
+@app.route('/api/chatroom/check', methods=['POST'])
 def chartroom():
     token = request.cookies.get("token")
     if token:
@@ -373,10 +494,9 @@ def chartroom():
             data = {'chat_only_name': chat_only_name}
             return {"chat_only_data": data}, 200
         else:
-            return 'Hello World!',333
+            return 'Hello World!', 333
     else:
-        return 'Hello World!',300
-
+        return 'Hello World!', 300
 
 
 # 注册
@@ -445,15 +565,40 @@ def login_token():
         return 'Hello World!', 500
 
 
-# 注销
-@app.route('/api/logout')
-def logout():
-    resp = make_response("del success")
-    resp.delete_cookie('token')
-    resp.delete_cookie('name')
-    return resp, 200
-    pass
+# 签到
+@app.route('/api/sign/in', methods=["POST"])
+def signs_in():
+    token = request.cookies.get("token")
+    if token:
+        username = get_redis_token(token=token)
+        user_email = get_username_email(username=username)
+        if set_redis_sign(email=user_email):
+            if not get_integrals_user(user_email=user_email):
+                set_integrals_user(user_email=user_email)
+            integral = random.randint(0, 100)
+            get_sign(user_email=user_email, integral=integral)
+            set_integrals(user_email=user_email, integral=integral)
+            date = {"integral": integral}
+            return date, 200
+        else:
+            return 'Hello World!', 443
+    else:
+        return 'Hello World!', 500
 
+
+# 注销
+@app.route('/api/logout', methods=['POST'])
+def logout():
+    token = request.cookies.get("token")
+    if token:
+        del_redis_token(token=token)
+        resp = make_response("del success")
+        resp.delete_cookie('token')
+        resp.delete_cookie('name')
+        return resp, 200
+    else:
+        return 'Hello World!', 363
+    pass
 
 
 # 聊天室获取
@@ -461,12 +606,20 @@ def logout():
 def content_all():
     token = request.cookies.get("token")
     if token:
+        username = get_redis_token(token=token)
+        user_email = get_username_email(username=username)
+        user_signs = content_set_list(get_redis_sign())
+        if user_email in user_signs:
+            integral_state = 0
+        else:
+            integral_state = 1
         content_data = get_all_content()
+        print({"content_data": content_data, "integral_state": integral_state})
         if content_data:
-            return {"content_data": content_data}, 200
+            return {"content_data": content_data, "integral_state": integral_state}, 200
             pass
         else:
-            return {"content_data": []}, 200
+            return {"content_data": [], "integral_state": integral_state}, 200
     else:
         return 'Hello World!', 300
 
@@ -488,7 +641,8 @@ def speak():
                 return resp, 500
             text = json_str({"chat_only_name": chat_only_name, "spoke_man": spoke_man, "spoke_time": spoke_time,
                              "spoken_text": spoken_text})
-            mysql_content_in(chat_only_name=chat_only_name, spoke_man=spoke_man, spoke_time=spoke_time, spoken_text=spoken_text)
+            mysql_content_in(chat_only_name=chat_only_name, spoke_man=spoke_man, spoke_time=spoke_time,
+                             spoken_text=spoken_text)
             set_redis_content(chat_only_name=chat_only_name, text=text)
             return 'Hello World!', 200
             pass
@@ -514,8 +668,8 @@ def speak_log():
             # print(data)
             data = sorted(data, key=lambda list1: list1["spoke_time"], reverse=True)
             data = time_make(data)
-            username=get_redis_token(token=token)
-            return {"data": data,"username":username}, 200
+            username = get_redis_token(token=token)
+            return {"data": data, "username": username}, 200
 
         else:
             return 'Hello World!', 400
@@ -524,12 +678,11 @@ def speak_log():
         return 'Hello World!', 300
 
 
-
-@app.route('/favicon.ico')#设置icon
+@app.route('/favicon.ico')  # 设置icon
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static/ico'),#对于当前文件所在路径,比如这里是static下的favicon.ico
+    return send_from_directory(os.path.join(app.root_path, 'static/ico'),  # 对于当前文件所在路径,比如这里是static下的favicon.ico
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 if __name__ == '__main__':
-    app.run(debug=False,host='0.0.0.0',port=7788)
+    app.run(debug=False, host='0.0.0.0', port=7788)

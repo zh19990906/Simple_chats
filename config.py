@@ -29,3 +29,7 @@ REDIS_PASSWORD='你的redis密码'
 TOOKEN_TIME_OUT=43200
 
 
+
+# 签到配置
+REDIS_SIGN_IN_DB='0'
+REDIS_SIGN_IN_NAME='sign_in'
