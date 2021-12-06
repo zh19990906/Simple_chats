@@ -25,3 +25,4 @@ RUN pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
 RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 CMD ["python3", "app.py"]
+CMD ["python3","Simple_redis_maintain.py"]
