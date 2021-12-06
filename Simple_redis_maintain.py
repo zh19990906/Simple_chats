@@ -8,8 +8,11 @@ def func():
     # print(key_list)
     for key in key_list:
         r.delete(key)
+    r = redis.Redis(host='地址', port='端口', db='库', decode_responses=True, password='密码')
+    r.delete('sign_in')
     print(time.strftime('%Y-%m-%d %H:%M:%S'))
     print('++++++++++++++=================')
+
 
 if __name__ == '__main__':
     schedule.every().day.at("00:00").do(func)
