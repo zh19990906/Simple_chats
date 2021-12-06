@@ -25,6 +25,7 @@ RUN pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
 RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 # 运行redis维护文件
-RUN nohup python3 /usr/src/app/Simple_redis_maintain.py >/dev/null 2>&1 &
+#RUN nohup python3 /usr/src/app/Simple_redis_maintain.py >/dev/null 2>&1 &
 
 CMD ["python3", "app.py"]
+#CMD ["python3","Simple_redis_maintain.py"]
