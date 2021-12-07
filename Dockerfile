@@ -24,6 +24,10 @@ RUN pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
 # 修改时区
 RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
+# docker内部安装部分应用 主要是方便在docker环境中修改文件 如果不需要可以直接注解掉 因为太慢了
+RUN apt-get update
+RUN apt-get -y install vim
+
 # 运行redis维护文件
 #RUN nohup python3 /usr/src/app/Simple_redis_maintain.py >/dev/null 2>&1 &
 
