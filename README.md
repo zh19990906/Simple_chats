@@ -48,6 +48,10 @@ docker run -itd --name 新名字 -p 宿主机端口:docker环境内的端口 -d 
 ip addr show docker0
 
 使用该命令查询docker的内网地址，一般为172.17.0.1/16，所以改为172.17.0.1这样可以减少网络IO，减少服务器负担，加快页面响应速度。
+### 速度优化对比
+
+![image](https://user-images.githubusercontent.com/59323683/144799423-e0e685a1-0b55-4422-bd50-24e8b42215df.png)
+
 
 ## 联系我
 Q：1093869292
