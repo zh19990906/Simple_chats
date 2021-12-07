@@ -1,7 +1,10 @@
 # Simple_chat
 
 ## 简易聊天室
+![Python](https://img.shields.io/badge/Python-3.7-green.svg)![Docker](https://img.shields.io/badge/Docker-20.10.9-green.svg)![redis](https://img.shields.io/badge/redis-4.0.8-green.svg)![MySQL](https://img.shields.io/badge/MySQL-5.7-green.svg)
+
 ### 介绍
+
 Redis+Python3+flask实现简易聊天室
 ### 源码
 [GitHub](https://github.com/zh19990906/Simple_chats)
