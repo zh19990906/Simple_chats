@@ -242,7 +242,6 @@ def content_set_list(data):
     # print("103869292@qq.com" in set_list)
     data_list = []
     for i in set_list:
-        # print(i)
         try:
             data_list.append(json.loads(i))
         except Exception as e:
