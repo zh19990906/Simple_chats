@@ -242,7 +242,7 @@ def content_set_list(data):
     # print("103869292@qq.com" in set_list)
     data_list = []
     for i in set_list:
-        print(i)
+        # print(i)
         try:
             data_list.append(json.loads(i))
         except Exception as e:
@@ -614,7 +614,7 @@ def content_all():
         else:
             integral_state = 1
         content_data = get_all_content()
-        print({"content_data": content_data, "integral_state": integral_state})
+        # print({"content_data": content_data, "integral_state": integral_state})
         if content_data:
             return {"content_data": content_data, "integral_state": integral_state}, 200
             pass
