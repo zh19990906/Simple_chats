@@ -50,7 +50,8 @@ ip addr show docker0
 使用该命令查询docker的内网地址，一般为172.17.0.1/16，所以改为172.17.0.1这样可以减少网络IO，减少服务器负担，加快页面响应速度。
 ### 速度优化对比
 
-![image](https://user-images.githubusercontent.com/59323683/144799423-e0e685a1-0b55-4422-bd50-24e8b42215df.png)
+![image](https://user-images.githubusercontent.com/59323683/144956975-9dd6ae64-5fd4-49f4-ac5a-28eeb3b8382e.png)
+
 
 
 ## 联系我
