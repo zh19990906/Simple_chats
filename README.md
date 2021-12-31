@@ -10,6 +10,7 @@ Redis+Python3+flask实现简易聊天室
 [GitHub](https://github.com/zh19990906/Simple_chats)
 
 ### 演示网址
+2021年12月31日演示网址停止查看，原因是服务器需要下载一下东西，清理了所有的docker镜像，如果有需要请联系我开启。
 
 [这里](http://49.232.30.93:7799/)
 
